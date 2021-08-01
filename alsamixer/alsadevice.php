@@ -98,7 +98,7 @@
 
     function reset_defaults(){
         for($i = 1; $i < 11; $i++){
-            $contents = amixer("cset numid={$i} 50");
+            $contents = amixer("cset numid={$i} 60");
         };
         exit(json_encode(Array(
             "status"=>true,
@@ -119,8 +119,8 @@
         if($contents != ""){
             $cmdl = "mpc pause";
             $stat="playing";
+	        exec($cmdl,$contents);        
         }
-        exec($cmdl,$contents);        
         $cmdl = "mpc enable only ".$val;               
         exec($cmdl,$contents);  
         if($stat=="playing"){

@@ -1,4 +1,7 @@
 <?php    
+//    require_once dirname(__FILE__) . '/inc/playerlib.php';
+    require_once '../inc/playerlib.php';
+    playerSession('open', '' ,'');
     $device = 'alsaequal'; 
     $preferences = Array();
     
@@ -30,6 +33,21 @@
             case 'setOutput':
                 setOutput($_POST['output']);
                 break;
+            case 'getCurves':
+                get_curves($_POST['curvename']);
+                break;
+            case 'saveCurve':
+                save_curve($_POST);
+                break;
+            case 'loadCurve':
+                load_curve($_POST);
+                break;
+            case 'deleteCurve':
+                delete_curve($_POST);
+                break;
+            case 'renameCurve':
+                rename_curve($_POST);
+                break;
             default:
                 echo "";
                 break;
@@ -38,9 +56,65 @@
     
     function get(){
         return interfacer();
-        
+    }
+
+    function delete_curve($request){
+        $result = sdbquery("DELETE FROM cfg_eqalsa WHERE curve_name='" . $request['curve_name'] . "'", cfgdb_connect());
+		$_SESSION['notify']['title'] = 'curve deleted!';
+        exit(json_encode($result,true));
     }
     
+    function rename_curve($request){
+        $dbh = cfgdb_connect();
+//        $result = sdbquery("SELECT id FROM cfg_eqalsa WHERE curve_name='" . $request['curve_name'] . "'", $dbh);
+        $result = sdbquery("UPDATE cfg_eqalsa SET curve_name='" . $request['new_name'] . "' WHERE curve_name='" . $request['curve_name'] . "'" , $dbh);
+		$_SESSION['notify']['title'] = 'curve reanmed!';
+        exit(json_encode($result,true));
+    }
+    
+    function get_curves($request){
+        $result = sdbquery('SELECT curve_name FROM cfg_eqalsa', cfgdb_connect());
+        exit(json_encode($result,true));
+    }
+    
+    function save_curve($request){
+        $dbh = cfgdb_connect();
+        $curve_values = $request['curve_values'];
+        $result = sdbquery("SELECT id FROM cfg_eqalsa WHERE curve_name='" . $request['curve_name'] . "'", $dbh);
+        if (empty($result[0])) {
+            // add
+            $newid = sdbquery('SELECT MAX(id)+1 FROM cfg_eqalsa', $dbh);
+            $result = sdbquery("INSERT INTO cfg_eqalsa VALUES ('" . $newid[0][0] . "','" . $request['curve_name'] . "','" . $curve_values . "')", $dbh);
+            $_GET['curve'] = $request['curve_name'];
+            $_SESSION['notify']['title'] = 'New curve added';
+        }
+        else {
+            // update
+            $result = sdbquery("UPDATE cfg_eqalsa SET curve_values='" . $curve_values . "' WHERE curve_name='" . $request['curve_name'] . "'" , $dbh);
+            $_SESSION['notify']['title'] = 'Curve updated';
+        }
+        exit(json_encode($result,true));
+    }
+    
+    function load_curve($request){
+        $dbh = cfgdb_connect();
+        $curve_name = $request['curve_name'];
+        $result = sdbquery("SELECT curve_values FROM cfg_eqalsa WHERE curve_name='" . $curve_name . "'", $dbh);
+        $values = explode(',', $result[0]['curve_values']);
+        if (count($values) > 0) {
+            for($i = 0; $i < 10; $i++){
+                $j=$i+1;
+                $contents = amixer("cset numid={$j} {$values[$i]}");
+            };
+            exit(json_encode(Array(
+                "status"=>true,
+                "amixer"=>$contents,
+                "sql"=>$values,
+                "output"=>  interfacer()
+            ),true));
+        }
+    }
+        
     function groups(){
 //        error_log("\n groups \n");
         $response = $this->interfacer();
@@ -98,7 +172,7 @@
 
     function reset_defaults(){
         for($i = 1; $i < 11; $i++){
-            $contents = amixer("cset numid={$i} 60");
+            $contents = amixer("cset numid={$i} 50");
         };
         exit(json_encode(Array(
             "status"=>true,
@@ -111,24 +185,26 @@
         ),true));
  */	
  }
-	function setOutput($output){
-		$val=intval($output)+1;
+     function setOutput($output){
+//        error_log("\n setOutput \n");
+//        error_log("\n $output \n");
         $stat = "";
         $cmdl = "mpc|grep playing";               
         exec($cmdl,$contents);        
         if($contents != ""){
             $cmdl = "mpc pause";
             $stat="playing";
-	        exec($cmdl,$contents);        
+            exec($cmdl,$contents);        
         }
-        $cmdl = "mpc enable only ".$val;               
+        $cmdl = "mpc enable only ".$output;               
         exec($cmdl,$contents);  
         if($stat=="playing"){
             $cmdl = "mpc play";               
             exec($cmdl,$contents);   
         }            
         exit(json_encode(Array(
-            "status"=>true
+            "status"=>true,
+            "content"=>$contents
         ),true));
         
     }

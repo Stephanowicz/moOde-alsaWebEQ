@@ -102,10 +102,20 @@
         $result = sdbquery("SELECT curve_values FROM cfg_eqalsa WHERE curve_name='" . $curve_name . "'", $dbh);
         $values = explode(',', $result[0]['curve_values']);
         if (count($values) > 0) {
-            for($i = 0; $i < 10; $i++){
-                $j=$i+1;
-                $contents = amixer("cset numid={$j} {$values[$i]}");
-            };
+            if (count($values) < 11) {
+                for($i = 0; $i < 10; $i++){
+                    $j=$i+1;
+                    $contents = amixer("cset numid={$j} {$values[$i]}");
+                };
+            }
+            else {
+                for($i = 0; $i < 10; $i++){
+                    $k=$i*2;
+                    $j=$i+1;
+                    $n=$k+1;
+                    $contents = amixer("cset numid={$j} {$values[$k]},{$values[$n]}");
+                };
+            }                
             exit(json_encode(Array(
                 "status"=>true,
                 "amixer"=>$contents,

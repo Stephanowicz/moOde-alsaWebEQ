@@ -36,13 +36,13 @@
             
         </div>
 		<div style="font: 1rem 'Fira Sans', sans-serif;"> output: <br /><select id="outputs" name="outputs" style="width: 130px;"></select></div>
-        <div style="font: 1rem 'Fira Sans', sans-serif;"> curves: <br /><select id="curves" name="curves" style="width: 130px;"></select><br />
-		<input type="button" id="loadCurve" name="loadCurve" style="margin: .4rem;margin-left: 0px;" value="load">
-        <input type="button" id="saveCurve" name="saveCurve" style="margin: .4rem;" value="save">
-        <input type="button" id="deleteCurve" name="deleteCurve" style="margin: .4rem;" value="delete"></div>
-        <div style="font: 1rem 'Fira Sans', sans-serif;">new/rename:<br /><input id="curveName" name="curveName" style="width: 130px;"><br />
-		<input type="button" id="newCurve" name="newCurve" style="margin: .4rem;margin-left: 0px;" value="new">
-        <input type="button" id="renameCurve" name="renameCurve" style="margin: .4rem;" value="rename">
+        <div style="font: 1rem 'Fira Sans', sans-serif;"> presets: <br /><select id="curves" name="curves" style="width: 130px;"></select><br />
+		<input type="button" class="button" id="loadCurve" name="loadCurve" style="margin: .4rem;margin-left: 0px;" value="load">
+        <input type="button" class="button" id="saveCurve" name="saveCurve" style="margin: .4rem;" value="save">
+        <input type="button" class="button" id="deleteCurve" name="deleteCurve" style="margin: .4rem;" value="delete"></div>
+        <div style="font: 1rem 'Fira Sans', sans-serif;">new / rename:<br /><input id="curveName" name="curveName" style="width: 130px;border-width: thin; color:black;"><br />
+		<input type="button" class="button" id="newCurve" name="newCurve" style="margin: .4rem;margin-left: 0px;" value="new">
+        <input type="button" class="button" id="renameCurve" name="renameCurve" style="margin: .4rem;" value="rename">
 		</div>
         <script type="text/html" id="tpl_control">
                     
@@ -227,6 +227,7 @@
                 var values = [];
                 $(".row", controls).each(function(x,val){
                     values.push($(".control-level",val)[0].innerText);
+                    values.push($(".control-level",val)[1].innerText);
                 });
                 var curvename = $('#curves')[0].options[$('#curves')[0].selectedIndex].text;
 	            $.post('alsadevice.php', {command:'saveCurve', curve_name: curvename, curve_values: values.join(",")}, function(response){

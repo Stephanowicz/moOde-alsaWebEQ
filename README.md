@@ -2,7 +2,7 @@
 simple web gui for alsaequal for use in a moOde setup
 
 normal view when called directly in the browser:  
-![image](https://user-images.githubusercontent.com/12005507/130596179-46a1365a-0a7a-4a8f-920d-149073aab0e5.png)
+![image](https://user-images.githubusercontent.com/12005507/130596179-46a1365a-0a7a-4a8f-920d-149073aab0e5.png)  
 integration in moOde:  
 ![image](https://user-images.githubusercontent.com/12005507/131179713-252bb026-ace2-4a63-9ce8-5eec915a0167.png)
 
@@ -16,11 +16,12 @@ It is expected that the name of the device is "alsaequal" (there should be a fil
 You have to put the files in a (new) folder in the /var/www/ folder (e.g. /var/www/alsamixer)  
 Then You may access the page with Your moOde webaddress adding /alsamixer --> moode.local/alsamixer  
 
-This is still in testing
+This is still in testing...  
 You can access the stored curve presets fom the moOde db - you may save, rename, delete and create curve presets
 (the curve presets of this app have stereo values - the will be stored and restored as stereo values - **be aware that the moOde presets only have one value per channel...  
-so the already integrated equalizer in moOde will load the 'wrong' values if they are in stereo**)
+so the already integrated equalizer in moOde will load the 'wrong' values if they are in stereo**)  
 You may instantly switch the output source for mpd - for the EQ You have to select "ALSA graphic eq" in the combobox  
+  
 the frontend can now be integrated into the moOde GUI: 
   
 **footer.php** (needs to be minified - e.g. with https://minifycode.com/html-minifier/ )  
